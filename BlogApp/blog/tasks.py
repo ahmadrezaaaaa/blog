@@ -1,5 +1,3 @@
-import time
-
 from BlogApp.celery import app
 
 

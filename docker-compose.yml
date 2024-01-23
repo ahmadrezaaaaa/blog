@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
     command: /usr/bin/env python /app/entrypoint.py
     volumes:
-      - "blog_app:/app"
+      - ".:/app"
       - "blog_staticfiles:/app/staticfiles"
     env_file:
       - .env
