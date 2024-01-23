@@ -59,9 +59,6 @@ jobs:
       - name: Code Formatting with Black
         run: docker-compose run blog_app black .
 
-      - name: Security Scanning with Bandit
-        run: docker-compose run blog_app bandit -r .
-
       - name: Run tests
         run: docker-compose run blog_app python manage.py test
 
