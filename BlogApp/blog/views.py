@@ -11,7 +11,7 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-    @action(methods=['get'], detail=False)
+    @action(methods=["get"], detail=False)
     def run_celery_task(self, request):
         task_result = add.delay(4, 4)
-        return Response({'task_status': task_result.status})
+        return Response({"task_status": task_result.status})

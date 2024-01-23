@@ -15,7 +15,7 @@ import dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-dotenv.load_dotenv(BASE_DIR / '.env')
+dotenv.load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -29,16 +29,14 @@ DEBUG = True if os.getenv("DEBUG") == "1" else False
 ALLOWED_HOSTS = ["*"]
 
 # Celery settings
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', "redis://localhost:6379")
-CELERY_RESULT_BACKEND = os.getenv('CELERY_BROKER_URL', "redis://localhost:6379")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379")
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
 # Application definition
@@ -88,13 +86,13 @@ WSGI_APPLICATION = "BlogApp.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PG_NAME', 'blog'),
-        'USER': os.getenv('PG_USERNAME', 'postgres'),
-        'PASSWORD': os.getenv('PG_PASSWORD', 'postgres'),
-        'HOST': os.getenv('PG_HOST', 'db'),
-        'PORT': os.getenv('PG_PORT', '5432'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("PG_NAME", "blog"),
+        "USER": os.getenv("PG_USERNAME", "postgres"),
+        "PASSWORD": os.getenv("PG_PASSWORD", "postgres"),
+        "HOST": os.getenv("PG_HOST", "db"),
+        "PORT": os.getenv("PG_PORT", "5432"),
     }
 }
 
@@ -131,7 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / 'staticfiles/'
+STATIC_ROOT = BASE_DIR / "staticfiles/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
