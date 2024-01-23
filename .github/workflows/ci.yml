@@ -63,6 +63,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Create dummy .env file
+        run: touch .env
       - name: Start services
         run: docker-compose up -d
         env:

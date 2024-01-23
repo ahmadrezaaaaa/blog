@@ -81,7 +81,7 @@ TEMPLATES = [
         },
     },
 ]
-TESTTTT=5
+
 WSGI_APPLICATION = "BlogApp.wsgi.application"
 
 # Database
