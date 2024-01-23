@@ -90,10 +90,10 @@ WSGI_APPLICATION = "BlogApp.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PG_NAME', 'kpm'),
+        'NAME': os.getenv('PG_NAME', 'blog'),
         'USER': os.getenv('PG_USERNAME', 'postgres'),
-        'PASSWORD': os.getenv('PG_PASSWORD', '4542'),
-        'HOST': os.getenv('PG_HOST', 'localhost'),
+        'PASSWORD': os.getenv('PG_PASSWORD', 'postgres'),
+        'HOST': os.getenv('PG_HOST', 'db'),
         'PORT': os.getenv('PG_PORT', '5432'),
     }
 }
