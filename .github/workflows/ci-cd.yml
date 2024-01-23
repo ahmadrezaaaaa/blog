@@ -60,10 +60,10 @@ jobs:
         run: docker-compose run blog_app black .
 
       - name: Run Coverage
-        run: docker-compose run coverage run manage.py test
+        run: docker-compose run blog_app coverage run manage.py test
 
       - name: Report coverage
-        run: docker-compose run coverage report
+        run: docker-compose run blog_app coverage report
 
       - name: Run tests
         run: docker-compose run blog_app python manage.py test
