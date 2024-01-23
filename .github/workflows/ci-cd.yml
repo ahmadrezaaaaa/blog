@@ -59,8 +59,11 @@ jobs:
       - name: Code Formatting with Black
         run: docker-compose run blog_app black .
 
-      - name: Check Code Coverage with Coverage.py
+      - name: Run Coverage
         run: docker-compose run coverage run manage.py test
+
+      - name: Report coverage
+        run: docker-compose run coverage report
 
       - name: Run tests
         run: docker-compose run blog_app python manage.py test
