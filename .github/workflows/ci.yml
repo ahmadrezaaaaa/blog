@@ -80,12 +80,33 @@ jobs:
 
       - name: Run migrations
         run: docker-compose run blog_app python manage.py migrate
+        env:
+          PG_NAME: ${{ secrets.PG_NAME }}
+          PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+          PG_USERNAME: ${{ secrets.PG_USERNAME }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
+          CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
 
       - name: Run tests
         run: docker-compose run blog_app python manage.py test
+        env:
+          PG_NAME: ${{ secrets.PG_NAME }}
+          PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+          PG_USERNAME: ${{ secrets.PG_USERNAME }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
+          CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
 
       - name: Lint with flake8
         run: docker-compose run blog_app flake8 .
+        env:
+          PG_NAME: ${{ secrets.PG_NAME }}
+          PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+          PG_USERNAME: ${{ secrets.PG_USERNAME }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
+          CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
 
       - name: Shut down
         run: docker-compose down
