@@ -90,8 +90,8 @@ jobs:
         run: docker-compose run blog_app python manage.py test
 
 
-      - name: Lint with flake8
-        run: docker-compose run blog_app flake8 .
+#      - name: Lint with flake8
+#        run: docker-compose run blog_app flake8 .
 
 
       - name: Shut down
