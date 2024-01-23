@@ -75,8 +75,8 @@ jobs:
           CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
           CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
 
-      - name: Wait for database
-        run: dockerize -wait tcp://localhost:5432 -timeout 1m
+#      - name: Wait for database
+#        run: dockerize -wait tcp://localhost:5432 -timeout 1m
 
       - name: Run migrations
         run: docker-compose run blog_app python manage.py migrate
