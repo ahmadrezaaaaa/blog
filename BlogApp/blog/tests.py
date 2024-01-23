@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from .models import Post
 from rest_framework.test import APITestCase, APIClient
 from django.test import TestCase
@@ -86,7 +87,7 @@ class PostEndpointsTest(APITestCase):
         # create the post
         new_post = self.create_post()
 
-        # get the post list
+        # get the posts list
         res = self.client.get(self.base_url + "posts/")
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         self.assertEquals(len(res.data), 1)
@@ -97,7 +98,7 @@ class PostEndpointsTest(APITestCase):
         # create one post
         new_post = self.create_post()
 
-        # get a specific post  list
+        # get a specific post
         res = self.client.get(self.base_url + f"posts/{new_post.id}/")
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         self.assertEquals(res.data["title"], new_post.title)
@@ -110,3 +111,86 @@ class PostEndpointsTest(APITestCase):
 
         # check if the task has been run
         self.assertIn(res.data["task_status"], ["PENDING", "STARTED", "SUCCESS"])
+
+
+class PostCachesTest(APITestCase):
+    client = APIClient(enforce_csrf_checks=True)
+    base_url = "/api/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test", password="test", is_superuser=True
+        )
+        data = {"username": "test", "password": "test"}
+        login_res = self.client.post(self.base_url + "token/", data, format="json")
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + login_res.data["access"])
+
+    @staticmethod
+    def create_post():
+        return Post.objects.create(title="title", content="content")
+
+    def test_post_list_caching(self):
+        # create the post
+        self.create_post()
+
+        # get the posts list
+        self.client.get(self.base_url + "posts/")
+        self.assertNotEquals(cache.get("posts_list"), None)
+
+    def test_delete_post_list_caching_on_save(self):
+        # create the post
+        self.create_post()
+
+        # get the posts list
+        self.client.get(self.base_url + "posts/")
+        self.assertNotEquals(cache.get("posts_list"), None)
+
+        # create a new posts to delete old cache
+        payload = {"title": "title2", "content": "content2"}
+        self.client.post(self.base_url + "posts/", payload)
+        self.assertEquals(cache.get("posts_list"), None)
+
+    def test_delete_post_list_caching_on_delete(self):
+        # create the post
+        new_post = self.create_post()
+
+        # check the posts cache
+        self.client.get(self.base_url + "posts/")
+        self.assertNotEquals(cache.get("posts_list"), None)
+
+        # delete the created post to check the data freshness
+        self.client.delete(self.base_url + f"posts/{new_post.id}/")
+        self.assertEquals(cache.get("posts_list"), None)
+
+    def test_post_retrieve_caching(self):
+        # create the post
+        new_post = self.create_post()
+
+        # get the posts list
+        self.client.get(self.base_url + f"posts/{new_post.id}/")
+        self.assertNotEquals(cache.get(f"{new_post.id}_retrieve"), None)
+
+    def test_delete_post_retrieve_caching_on_delete(self):
+        # create the post
+        new_post = self.create_post()
+
+        # get the posts list
+        self.client.get(self.base_url + f"posts/{new_post.id}/")
+        self.assertNotEquals(cache.get(f"{new_post.id}_retrieve"), None)
+
+        # delete the record to test if the cache has been deleted
+        self.client.delete(self.base_url + f"posts/{new_post.id}/")
+        self.assertEquals(cache.get(f"{new_post.id}_retrieve"), None)
+
+    def test_delete_post_retrieve_caching_on_update(self):
+        # create the post
+        new_post = self.create_post()
+
+        # get the posts list
+        self.client.get(self.base_url + f"posts/{new_post.id}/")
+        self.assertNotEquals(cache.get(f"{new_post.id}_retrieve"), None)
+
+        # update to test if the cache has been deleted
+        payload = {"title": "title", "content": "new content"}
+        self.client.put(self.base_url + f"posts/{new_post.id}/", payload)
+        self.assertEquals(cache.get(f"{new_post.id}_retrieve"), None)
