@@ -31,7 +31,9 @@ class PostPermissionsTest(APITestCase):
         res = self.client.post(self.base_url + "posts/", payload)
         self.assertEquals(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(
-            Post.objects.filter(title=payload["title"], content=payload["content"]).exists()
+            Post.objects.filter(
+                title=payload["title"], content=payload["content"]
+            ).exists()
         )
 
         # give th add permission to user
@@ -43,7 +45,9 @@ class PostPermissionsTest(APITestCase):
         res = self.client.post(self.base_url + "posts/", payload)
         self.assertEquals(res.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
-            Post.objects.filter(title=payload["title"], content=payload["content"]).exists()
+            Post.objects.filter(
+                title=payload["title"], content=payload["content"]
+            ).exists()
         )
 
     def test_post_update(self):

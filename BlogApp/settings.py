@@ -38,7 +38,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
-        "BlogApp.permissions.CustomModelPermission"
+        "BlogApp.permissions.CustomModelPermission",
     ),
 }
 
