@@ -3,9 +3,104 @@ from .models import Post
 from rest_framework.test import APITestCase, APIClient
 from django.test import TestCase
 from rest_framework import status
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from .serializers import PostSerializer
 from .tasks import add
+
+
+class PostPermissionsTest(APITestCase):
+    client = APIClient(enforce_csrf_checks=True)
+    base_url = "/api/"
+
+    def setUp(self):
+        # create a simple user with no permission
+        self.user = User.objects.create_user(
+            username="test", password="test", is_superuser=False
+        )
+        data = {"username": "test", "password": "test"}
+        login_res = self.client.post(self.base_url + "token/", data, format="json")
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + login_res.data["access"])
+
+    @staticmethod
+    def create_post():
+        return Post.objects.create(title="title", content="content")
+
+    def test_post_create(self):
+        # create a post
+        payload = {"title": "title", "content": "content"}
+        res = self.client.post(self.base_url + "posts/", payload)
+        self.assertEquals(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(
+            Post.objects.filter(title=payload["title"], content=payload["content"]).exists()
+        )
+
+        # give th add permission to user
+        permission = Permission.objects.get(codename="add_post")
+        self.user.user_permissions.add(permission)
+
+        # test again
+        payload = {"title": "title", "content": "content"}
+        res = self.client.post(self.base_url + "posts/", payload)
+        self.assertEquals(res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Post.objects.filter(title=payload["title"], content=payload["content"]).exists()
+        )
+
+    def test_post_update(self):
+        # create a post
+        new_post = self.create_post()
+
+        # try update it
+        payload = {"title": "title", "content": "new content"}
+        res = self.client.put(self.base_url + f"posts/{new_post.id}/", payload)
+        updated_post = Post.objects.get(pk=new_post.id)
+        self.assertEquals(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEquals(updated_post.content, payload["content"])
+
+        # give th add permission to user
+        permission = Permission.objects.get(codename="change_post")
+        self.user.user_permissions.add(permission)
+
+        # test again
+        payload = {"title": "title", "content": "new content"}
+        res = self.client.put(self.base_url + f"posts/{new_post.id}/", payload)
+        updated_post = Post.objects.get(pk=new_post.id)
+        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEquals(updated_post.content, payload["content"])
+
+    def test_post_list(self):
+        # create a post
+        new_post = self.create_post()
+
+        # try get it
+        res = self.client.get(self.base_url + "posts/")
+        self.assertEquals(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # give th add permission to user
+        permission = Permission.objects.get(codename="view_post")
+        self.user.user_permissions.add(permission)
+
+        # test again
+        res = self.client.get(self.base_url + "posts/")
+        self.assertEquals(res.status_code, status.HTTP_200_OK)
+
+    def test_post_delete(self):
+        # create a post
+        new_post = self.create_post()
+
+        # try delete it
+        res = self.client.delete(self.base_url + f"posts/{new_post.id}/")
+        self.assertEquals(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Post.objects.filter(id=new_post.id).exists())
+
+        # give th add permission to user
+        permission = Permission.objects.get(codename="delete_post")
+        self.user.user_permissions.add(permission)
+
+        # test again
+        res = self.client.delete(self.base_url + f"posts/{new_post.id}/")
+        self.assertEquals(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Post.objects.filter(id=new_post.id).exists())
 
 
 class PostTasksTest(TestCase):
