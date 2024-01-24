@@ -104,6 +104,16 @@ class PostEndpointsTest(APITestCase):
         self.assertEquals(res.data["title"], new_post.title)
         self.assertEquals(res.data["content"], new_post.content)
 
+    def test_post_delete(self):
+        # create a post
+        new_post = self.create_post()
+
+        # delete and check if has been deleted
+        res = self.client.delete(self.base_url + f"posts/{new_post.id}/")
+        self.assertEquals(res.status_code, status.HTTP_204_NO_CONTENT)
+        new_post = Post.objects.filter(id=new_post.id).exists()
+        self.assertFalse(new_post)
+
     def test_post_add_task(self):
         # test the task endpoint
         res = self.client.get(self.base_url + "posts/run_celery_task/")
@@ -190,7 +200,7 @@ class PostCachesTest(APITestCase):
         self.client.get(self.base_url + f"posts/{new_post.id}/")
         self.assertNotEquals(cache.get(f"{new_post.id}_retrieve"), None)
 
-        # update to test if the cache has been deleted
+        #  update to test if the cache has been deleted
         payload = {"title": "title", "content": "new content"}
         self.client.put(self.base_url + f"posts/{new_post.id}/", payload)
         self.assertEquals(cache.get(f"{new_post.id}_retrieve"), None)
