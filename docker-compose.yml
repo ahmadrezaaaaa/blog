@@ -27,7 +27,6 @@ services:
     restart: unless-stopped
     command: python /app/entrypoint.py
     volumes:
-      - ".:/app"
       - "blog_staticfiles:/app/staticfiles"
     env_file:
       - .env
@@ -55,5 +54,4 @@ services:
 volumes:
   db:
   redis:
-  blog_app:
   blog_staticfiles:
