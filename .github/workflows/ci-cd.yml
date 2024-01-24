@@ -60,11 +60,9 @@ jobs:
       - name: Code Formatting with Black
         run: docker-compose run blog_app black .
 
-      - name: Run Tests
-        run: docker-compose run blog_app coverage run manage.py test
+      - name: Run Tests and Generate Coverage Report
+        run: docker-compose run blog_app sh -c "coverage run manage.py test && coverage report"
 
-      - name: Report Test Coverage
-        run: docker-compose run blog_app coverage report
 
       - name: Shut down
         run: docker-compose down
